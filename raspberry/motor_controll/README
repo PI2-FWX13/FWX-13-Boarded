@@ -3,8 +3,9 @@
 To run the motor_controll executable run the following commands on the terminal
 
 ```
-* $ make clean
-* $ make
-* $ make run
+
+make clean
+make
+make run
 
 ```
