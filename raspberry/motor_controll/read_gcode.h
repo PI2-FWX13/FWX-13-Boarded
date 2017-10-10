@@ -5,7 +5,7 @@
   extern float Xs[1000];
   extern float Ys[1000];
   extern float Zs[1000];
-
+  extern int numberOfLines;
   // Execute this function before accessing values
   void readGCode();
   int getCoordinates(char * line);

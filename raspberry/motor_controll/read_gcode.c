@@ -9,6 +9,7 @@ float Xs[1000];
 float Ys[1000];
 float Zs[1000];
 
+int numberOfLines;
 // same position for each value
 int count = 0;
 
@@ -58,6 +59,8 @@ void readGCode()
   size_t len = 0;
   ssize_t read;
 
+  numberOfLines = 0;
+
   fp = fopen("gcode", "r");
   if (fp == NULL)
     exit(EXIT_FAILURE);
@@ -76,6 +79,7 @@ void readGCode()
     Ys[count] = Ys[count-1];
     Zs[count] = Zs[count-1];
 
+    numberOfLines++;
     //printf("Read X = %f Y = %f Z = %f\n",Xs[count],Ys[count],Zs[count]);
   }
 
