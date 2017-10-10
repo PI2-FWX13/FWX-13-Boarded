@@ -1,45 +1,57 @@
+#include "read_gcode.c"
+
 #include <stdio.h>
 #include <stdlib.h>
-
+#include <string.h>
 
 /* Informações para não esquecer:
 Tamanho eixo x: 2*pi*r = 2*3.1415*100 = 628.3 mm
 Tamanho eixo y: 1.2 m = 1200 mm
-Tamanho eixo z: 20 cm = 200 mm 
+Tamanho eixo z: 20 cm = 200 mm
 Cálculo velocidade: rpm = (frequencia x 60)/200*(nº de divisão de passo)
 Sentido: 0 -> horário
-	 1 -> anti-horário	
+	 1 -> anti-horário
 As variáveis que serão passadas para o ATMega serão: freq_x,freq_y,freq_z e sentido_x, sentido_y, sentido_z, tempo*/
+/*Xs[3] = {123.00, 120.00, 243.00}, Ys[3] = {10.00, 1000.00, 920.00}, Zs[3] = {40.00, 40.00, 40.00},*/
 
 #define freq_max 300
 #define rpm_max 90
 
 int main()
 {
-	double x[3] = {123.00, 120.00, 243.00}, y[3] = {10.00, 1000.00, 920.00}, z[3] = {40.00, 40.00, 40.00}, tempo, rpm_x, rpm_y, rpm_z, freq_x, freq_y, freq_z;
-	double tempo_x, tempo_y, tempo_z;
+	int i;
+	float tempo, rpm_x, rpm_y, rpm_z, freq_x, freq_y, freq_z;
+	float tempo_x, tempo_y, tempo_z;
 	int sentido_x=0, sentido_y=0, sentido_z=0; // Variáveis que controlarão o sentido dos motores
+	printf("GETTING GCODE INPUT\n");
 
-	for(int i=0; i < 3; i++)
+	readGCode();
+
+	printf("START WINDING\n");
+
+	for(i=0; i < 10; i++)
 	{
+		printf("INPUT %d\n",i);
+
 		if (i == 0) // Se for a primeira vez do loop, não há posição anterior, logo mede-se só com a primeira posição
 		{
-			tempo_x = x[i]/rpm_max;
-			tempo_y = y[i]/rpm_max;
-			tempo_z = z[i]/rpm_max;
+			tempo_x = Xs[i]/rpm_max;
+			tempo_y = Ys[i]/rpm_max;
+			tempo_z = Zs[i]/rpm_max;
 		}
 		else // Caso contrário, mede-se a diferença entre as duas posições na fórmula: vel = espaço/tempo
-		{	
-			sentido_x = sentido_y = sentido_z = 0;		
-			tempo_x = (x[i]-x[i-1])/rpm_max;
-			tempo_y = (y[i]-y[i-1])/rpm_max;
-			tempo_z = (z[i]-z[i-1])/rpm_max;
+		{
+			sentido_x = sentido_y = sentido_z = 0;
+			tempo_x = (Xs[i]-Xs[i-1])/rpm_max;
+			tempo_y = (Ys[i]-Ys[i-1])/rpm_max;
+			tempo_z = (Zs[i]-Zs[i-1])/rpm_max;
 		}
+
 		if (tempo_x < 0) // Esses ifs são para caso a diferença seja negativa (ou seja, o motor tem que voltar - girar no sentido antihorário -)
 		{
 			tempo_x *= -1;
 			sentido_x = 1;
-		}			
+		}
 		if (tempo_y < 0)
 		{
 			tempo_y *= -1;
@@ -65,15 +77,15 @@ int main()
 
 		if (i == 0) // Mesma lógica do if (i == 0) de cima
 		{
-			rpm_x = x[i]/tempo;
-			rpm_y = y[i]/tempo;
-			rpm_z = z[i]/tempo;
+			rpm_x = Xs[i]/tempo;
+			rpm_y = Ys[i]/tempo;
+			rpm_z = Zs[i]/tempo;
 		}
 		else // agora calcula-se a velocidade de cada um de acordo com o que tem que andar no tempo já determinado acima
 		{
-			rpm_x = (x[i] - x[i-1])/tempo;
-			rpm_y = (y[i] - y[i-1])/tempo;
-			rpm_z = (z[i] - z[i-1])/tempo;
+			rpm_x = (Xs[i] - Xs[i-1])/tempo;
+			rpm_y = (Ys[i] - Ys[i-1])/tempo;
+			rpm_z = (Zs[i] - Zs[i-1])/tempo;
 		}
 		if (rpm_x < 0)
 			rpm_x *= -1;
@@ -85,11 +97,11 @@ int main()
 		printf("RPM em x: %f\n", rpm_x);
 		printf("RPM em y: %f\n", rpm_y);
 		printf("RPM em z: %f\n", rpm_z);
-		
+
 		freq_x = (rpm_x * 200)/60; // essa fórmula para calcular a frequência está escrita nos comentários na parte de cima do código
 		freq_y = (rpm_y * 200)/60;
 		freq_z = (rpm_z * 200)/60;
-		
+
 		printf("Frequência em x: %f\n", freq_x);
 		printf("Frequência em y: %f\n", freq_y);
 		printf("Frequência em z: %f\n", freq_z);
@@ -99,4 +111,5 @@ int main()
 		printf("Sentido que o motor vai girar em z: %d\n", sentido_z);
 	}
 
+	return 0;
 }

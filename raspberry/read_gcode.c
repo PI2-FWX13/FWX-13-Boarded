@@ -1,3 +1,5 @@
+#include "read_gcode.h"
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -47,7 +49,7 @@ int count = 0;
   }
 
 
-int main(void)
+void readGCode()
 {
   //https://stackoverflow.com/questions/3501338/c-read-file-line-by-line
   //https://stackoverflow.com/questions/13399594/how-to-extract-numbers-from-string-in-c
@@ -73,13 +75,12 @@ int main(void)
     Xs[count] = Xs[count-1];
     Ys[count] = Ys[count-1];
     Zs[count] = Zs[count-1];
-    
-    printf("Read X = %f Y = %f Z = %f\n",Xs[count],Ys[count],Zs[count]);
+
+    //printf("Read X = %f Y = %f Z = %f\n",Xs[count],Ys[count],Zs[count]);
   }
 
   fclose(fp);
   if (line)
       free(line);
-  exit(EXIT_SUCCESS);
-
+    return;
 }
