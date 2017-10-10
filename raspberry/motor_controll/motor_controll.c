@@ -17,7 +17,6 @@ Xs[3] = {123.00, 120.00, 243.00}, Ys[3] = {10.00, 1000.00, 920.00}, Zs[3] = {40.
 As variáveis que serão passadas para o ATMega serão: freq_x,freq_y,freq_z e sentido_x, sentido_y, sentido_z
 As variáveis que serão passadas para o ATMega serão: freq_x,freq_y,freq_z e sentido_x, sentido_y, sentido_z, tempo*/
 
-
 #define freq_max 300
 #define rpm_max 90
 
