@@ -1,0 +1,49 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <signal.h>
+#include <wiringPi.h>
+#include <wiringSerial.h>
+
+
+#define TTY "/dev/ttyAMA0"
+
+int uart0_fd;
+void ctrl_c(int sig)
+{
+
+        close(uart0_fd);
+        exit(-1);
+}
+
+int main(void)
+{
+        int user_input = 1;
+        int freq = 0;
+
+        signal(SIGINT, ctrl_c);
+        uart0_fd = serialOpen(TTY, 9600);
+        if(uart0_fd==-1)
+        {
+                     
+                return -1;
+        }
+
+        serialFlush(uart0_fd);
+        if(serialDataAvail(uart0_fd)!=0) puts("Oh oh");
+        while(user_input!=0)
+        {
+                puts("Digite um numero de voltas do motor");
+                scanf("%d", &user_input);
+                if((user_input<0) || (user_input>5000))
+                        puts("Valor invalido");
+                else if(user_input>0)
+                {
+                        serialPutchar(uart0_fd, user_input);
+                        printf("Arduino = %d\n", serialGetchar(uart0_fd));
+
+                }
+                puts("");
+        }
+        serialClose(uart0_fd);
+
+}
