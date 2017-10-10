@@ -9,7 +9,11 @@ Tamanho eixo z: 20 cm = 200 mm
 Cálculo velocidade: rpm = (frequencia x 60)/200*(nº de divisão de passo)
 Sentido: 0 -> horário
 	 1 -> anti-horário	
+<<<<<<< HEAD
 As variáveis que serão passadas para o ATMega serão: freq_x,freq_y,freq_z e sentido_x, sentido_y, sentido_z*/
+=======
+As variáveis que serão passadas para o ATMega serão: freq_x,freq_y,freq_z e sentido_x, sentido_y, sentido_z, tempo*/
+>>>>>>> 5a9e9cb069662aa94a0806876bdbdf8fda5dabb8
 
 #define freq_max 300
 #define rpm_max 90
@@ -18,24 +22,40 @@ int main()
 {
 	double x[3] = {123.00, 120.00, 243.00}, y[3] = {10.00, 1000.00, 920.00}, z[3] = {40.00, 40.00, 40.00}, tempo, rpm_x, rpm_y, rpm_z, freq_x, freq_y, freq_z;
 	double tempo_x, tempo_y, tempo_z;
+<<<<<<< HEAD
 	int sentido_x=0, sentido_y=0, sentido_z=0;
 
 	for(int i=0; i < 3; i++)
 	{
 		if (i == 0)
+=======
+	int sentido_x=0, sentido_y=0, sentido_z=0; // Variáveis que controlarão o sentido dos motores
+
+	for(int i=0; i < 3; i++)
+	{
+		if (i == 0) // Se for a primeira vez do loop, não há posição anterior, logo mede-se só com a primeira posição
+>>>>>>> 5a9e9cb069662aa94a0806876bdbdf8fda5dabb8
 		{
 			tempo_x = x[i]/rpm_max;
 			tempo_y = y[i]/rpm_max;
 			tempo_z = z[i]/rpm_max;
 		}
+<<<<<<< HEAD
 		else
+=======
+		else // Caso contrário, mede-se a diferença entre as duas posições na fórmula: vel = espaço/tempo
+>>>>>>> 5a9e9cb069662aa94a0806876bdbdf8fda5dabb8
 		{	
 			sentido_x = sentido_y = sentido_z = 0;		
 			tempo_x = (x[i]-x[i-1])/rpm_max;
 			tempo_y = (y[i]-y[i-1])/rpm_max;
 			tempo_z = (z[i]-z[i-1])/rpm_max;
 		}
+<<<<<<< HEAD
 		if (tempo_x < 0)
+=======
+		if (tempo_x < 0) // Esses ifs são para caso a diferença seja negativa (ou seja, o motor tem que voltar - girar no sentido antihorário -)
+>>>>>>> 5a9e9cb069662aa94a0806876bdbdf8fda5dabb8
 		{
 			tempo_x *= -1;
 			sentido_x = 1;
@@ -51,8 +71,14 @@ int main()
 			sentido_z = 1;
 		}
 
+<<<<<<< HEAD
 		printf("Tempo em x: %f, Tempo em y: %f, Tempo em z:%f\n", tempo_x, tempo_y, tempo_z);
 
+=======
+		printf("Tempo em x: %f, Tempo em y: %f, Tempo em z:%f\n", tempo_x, tempo_y, tempo_z); // Todos esses printfs vão ser apagados, é só pra testar as saídas
+
+        // Esses ifs são para escolher o maior tempo necessário entre os três motores. Assim, o maior tempo é o tempo que será utilizado para os três
+>>>>>>> 5a9e9cb069662aa94a0806876bdbdf8fda5dabb8
 		if (tempo_x > tempo_y && tempo_x > tempo_z)
 			tempo = tempo_x;
 		if (tempo_y > tempo_x && tempo_y > tempo_z)
@@ -60,15 +86,25 @@ int main()
 		if (tempo_z > tempo_x && tempo_z > tempo_y)
 			tempo = tempo_z;
 		printf("Tempo que será utilizado: %f\n", tempo);
+<<<<<<< HEAD
 		tempo += 0.1;
 
 		if (i == 0)
+=======
+		tempo += 0.1; // Eu aumentei o tempo em 0.1 para não ser necessário usar a frequência máxima do motor, mas acho que depois vou colocar outra lógica
+
+		if (i == 0) // Mesma lógica do if (i == 0) de cima
+>>>>>>> 5a9e9cb069662aa94a0806876bdbdf8fda5dabb8
 		{
 			rpm_x = x[i]/tempo;
 			rpm_y = y[i]/tempo;
 			rpm_z = z[i]/tempo;
 		}
+<<<<<<< HEAD
 		else
+=======
+		else // agora calcula-se a velocidade de cada um de acordo com o que tem que andar no tempo já determinado acima
+>>>>>>> 5a9e9cb069662aa94a0806876bdbdf8fda5dabb8
 		{
 			rpm_x = (x[i] - x[i-1])/tempo;
 			rpm_y = (y[i] - y[i-1])/tempo;
@@ -85,7 +121,11 @@ int main()
 		printf("RPM em y: %f\n", rpm_y);
 		printf("RPM em z: %f\n", rpm_z);
 		
+<<<<<<< HEAD
 		freq_x = (rpm_x * 200)/60;
+=======
+		freq_x = (rpm_x * 200)/60; // essa fórmula para calcular a frequência está escrita nos comentários na parte de cima do código
+>>>>>>> 5a9e9cb069662aa94a0806876bdbdf8fda5dabb8
 		freq_y = (rpm_y * 200)/60;
 		freq_z = (rpm_z * 200)/60;
 		
