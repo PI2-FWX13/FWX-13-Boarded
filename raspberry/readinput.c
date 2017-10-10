@@ -60,10 +60,21 @@ int main(void)
   if (fp == NULL)
     exit(EXIT_FAILURE);
 
+  // First value is 0
+  Xs[count] = 0;
+  Ys[count] = 0;
+  Zs[count] = 0;
+
   while ((read = getline(&line, &len, fp)) != -1) {
-    //printf("Retrieved line of length %zu :\n", read);
-    //printf("%s", line);
+
     getCoordinates(line);
+
+    // Set Next values so that it will not be null
+    Xs[count] = Xs[count-1];
+    Ys[count] = Ys[count-1];
+    Zs[count] = Zs[count-1];
+    
+    printf("Read X = %f Y = %f Z = %f\n",Xs[count],Ys[count],Zs[count]);
   }
 
   fclose(fp);
