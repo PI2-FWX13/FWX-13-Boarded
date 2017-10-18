@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include <math.h>
 
-
+// Para compilar gcc get_temperature.c -o run -lwiringPi -lm
 // A pinagem foi aleatória porque não olhei pino por pino ainda na rasp
 #define in1 0
 #define in2 1
