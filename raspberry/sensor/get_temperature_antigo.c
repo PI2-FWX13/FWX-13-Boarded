@@ -4,30 +4,35 @@
 #include <math.h>
 
 // Para compilar gcc get_temperature.c -o run -lwiringPi -lm
+// A pinagem foi aleatória porque não olhei pino por pino ainda na rasp
+#define in1 0
+#define in2 1
+#define in3 2
+#define in4 3
+#define in5 4
+#define in6 5
+#define in7 6
+#define in8 7
+
 
 int main() // Isso vai ser uma thread
 {
 	wiringPiSetup(); //Inicializa a WiringPi
-	int in[] = {8, 9, 7, 0, 2, 3, 12, 13};
+	int in[8];
 	for(int i=0; i<8; i++)
 		pinMode(in[i], INPUT); //Denomina os pinos como entradas
-	pinMode(14, OUTPUT);
+
 	int b[8];
+	double temperatura=0;
 
 	while (1)
 	{
-		float temperatura = 0;
-		digitalWrite(14, HIGH);
-		delay(100);
-		digitalWrite(14, LOW);
-		delay(100);
 		for (int i=0; i<8; i++)
 		{
 			b[i] = digitalRead(in[i]); //Lê as entradas
-			printf("Bit [%d]: %d ", i, b[i]);
 			temperatura += b[i]*(pow(2, i)); //Pega cada bit e multiplica pelo seu valor 
 		}
-		temperatura = (temperatura)*2; // 2 é porque o valor no circuito tá saindo pela metade
+		temperatura = (temperatura*0.019)*2; // 0.019 é a resolução e 2 é porque o valor no circuito tá saindo pela metade
 		printf("Temperatura: %f graus Celsius.\n", temperatura);
 	}
 }
@@ -42,6 +47,7 @@ int main() // Isso vai ser uma thread
 		{
 			temperatura += in[i]*(pow(2,i));
 		}
+		temperatura = (temperatura*0.019);
 		printf("Temperatura: %f graus Celsius.\n", temperatura);
 	
 }*/
