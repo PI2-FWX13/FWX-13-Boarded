@@ -1,0 +1,182 @@
+// Bibliotecas
+#include <AccelStepper.h>
+#include <MultiStepper.h>
+#include <SoftwareSerial.h>
+#include <string.h>
+SoftwareSerial serial1(6, 7); // RX, TX
+
+// Structs
+struct Motor {
+  float frequencia;
+  float posicao;
+  char sentido;
+};
+
+struct Instrucao {
+  float tempo;
+  struct Motor motores[3];
+};
+struct Instrucao instrucao = {};
+
+AccelStepper stepperX(AccelStepper::FULL4WIRE, 0, 1, 2, 3); 
+AccelStepper stepperY(AccelStepper::FULL4WIRE, 4, 5, 8, 9);
+AccelStepper stepperZ(AccelStepper::FULL4WIRE, 10, 11, 12, 13);
+
+//Definicoes
+#define X 0
+#define Y 1
+#define Z 2
+
+
+
+//Variaveis globais
+char chave_mestre[] = "ABC";
+char mandar_byte;
+int tag, ack_bit = 1, n = 0;
+long interval;
+
+
+// Prototipos
+void encontrar_chave();
+int eh_igual(char *chave);
+void ler_instrucao();
+float ler_float();
+char ler_char();
+int myDelay(float interval);
+
+
+// Setup
+void setup()
+{
+  serial1.begin(9600);
+  Serial.begin(9600);  
+  stepperX.setEnablePin(14); // Foi colocado os pinos de enable no mesmo pino ja que os tres vao estar habilitados ao mesmo tempo (e por falta de portas)
+  stepperY.setEnablePin(14); // 14 eh a porta A0 do arduino
+  stepperZ.setEnablePin(14);
+
+  stepperX.setMaxSpeed(250); // Freq (passo/s) maximo
+  stepperY.setMaxSpeed(250);
+  stepperZ.setMaxSpeed(250);
+}
+
+// Loop
+void loop()
+{
+    if(ack_bit) {
+          Serial.println("Entrei no ackbit.");
+          ler_instrucao();
+    }
+    else
+    {
+       //Serial.println("Estou no else\n");
+       Serial.println(instrucao.tempo);
+       while(myDelay(instrucao.tempo));
+       ack_bit = 1;  
+       serial1.write(5);
+       //Serial.println("Escrevi o numero na rasp");       
+    }
+}
+
+void ler_instrucao()
+{
+    //Serial.println("Entrei na funcao.");
+    if (n == 0)
+    {
+      while(!serial1.available())
+          serial1.write(5);
+      n = 1;
+    }
+    memset(&instrucao, 0, sizeof(instrucao));
+    
+    encontrar_chave();
+    instrucao.motores[X].frequencia = ler_float();
+    instrucao.motores[Y].frequencia = ler_float();
+    instrucao.motores[Z].frequencia = ler_float();
+    instrucao.motores[X].sentido = ler_char();
+    instrucao.motores[Y].sentido = ler_char();
+    instrucao.motores[Z].sentido = ler_char();
+    instrucao.tempo = ler_float();
+    instrucao.motores[X].posicao = ler_float();
+    instrucao.motores[Y].posicao = ler_float();
+    instrucao.motores[Z].posicao = ler_float();
+    ack_bit = 0;
+     
+     
+    //Serial.println("Dados ok");
+    Serial.println(instrucao.motores[X].frequencia);
+    Serial.println(instrucao.motores[Y].frequencia);
+    Serial.println(instrucao.motores[Z].frequencia);
+    Serial.println((int)instrucao.motores[X].sentido);
+    Serial.println((int)instrucao.motores[Y].sentido);
+    Serial.println((int)instrucao.motores[Z].sentido);
+    Serial.println(instrucao.tempo);
+    Serial.println(instrucao.motores[X].posicao);
+    Serial.println(instrucao.motores[Y].posicao);
+    Serial.println(instrucao.motores[Z].posicao);
+    Serial.flush();
+    
+    
+    
+}
+
+void encontrar_chave()
+{
+  char chave[3];
+  while(!serial1.available());
+  for (int i = 0; i < 3; i++) 
+  {
+      chave[i] = serial1.read();
+      Serial.println(chave[i]);
+  }
+  while(!eh_igual(chave))
+  {
+     for (int i = 0; i < 2; i++)
+       chave[i] = chave[i+1];
+     chave[2] = serial1.read();
+     //Serial.println("Encontrando chave...");
+  }
+  Serial.println("Chave encontrada.");
+}
+  
+int eh_igual(char *chave)
+{
+  for (int i = 0; i < 3; i++)
+  {
+    if(chave[i] != chave_mestre[i])
+        return 0;
+  }
+  return 1;
+}
+
+float ler_float()
+{
+  float dado_f;
+  char c_pointer[sizeof(float)];
+  for(int i = 0; i < sizeof(float); i++)
+      *(c_pointer + i) = serial1.read();
+  dado_f = *((float *) c_pointer);
+  return dado_f;
+}
+
+char ler_char()
+{
+  char dado_c;
+  dado_c = serial1.read();
+  return dado_c;
+}
+
+int myDelay(float interval)
+{
+    long init = millis();
+    stepperX.moveTo(instrucao.motores[X].posicao);
+    stepperY.moveTo(instrucao.motores[Y].posicao);
+    stepperZ.moveTo(instrucao.motores[Z].posicao);
+    stepperX.setSpeed(instrucao.motores[X].frequencia);
+    stepperY.setSpeed(instrucao.motores[Y].frequencia);
+    stepperZ.setSpeed(instrucao.motores[Z].frequencia);
+    stepperX.setAcceleration(30.0);
+    stepperY.setAcceleration(30.0);
+    stepperZ.setAcceleration(30.0);
+    while ((millis() - init) <= interval*1000);
+    return 0;    
+}
