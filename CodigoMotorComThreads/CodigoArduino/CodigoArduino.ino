@@ -109,16 +109,27 @@ void loop()
        Serial.println(comp);
        //stepperX.setSpeed(+instrucao.motores[X].frequencia);
        p = 0;
-       while(stepperX.distanceToGo() != 0 && stepperY.distanceToGo() != 0)
+       if (stepperX.distanceToGo() == 0)
        {
-           Serial.println(stepperX.distanceToGo());   
-           Serial.println(stepperY.distanceToGo());
-           stepperX.runSpeed();
-           p++;
-           if (p == (comp + 1) || instrucao.motores[X].frequencia == 0) 
-           {
+         while (stepperY.distanceToGo() != 0)
+         {
+             Serial.println(stepperY.distanceToGo());     
              stepperY.runSpeed();
-             p = 0;
+         }
+       }
+       else
+       {
+           while(stepperX.distanceToGo() != 0 && stepperY.distanceToGo() != 0)
+           {
+               Serial.println(stepperX.distanceToGo());   
+               Serial.println(stepperY.distanceToGo());
+               stepperX.runSpeed();
+               p++;
+               if (p == (comp+1)) //(comp + 1)
+               {
+                   stepperY.runSpeed();
+                   p = 0;
+               }
            }
        }
        Serial.println(stepperX.distanceToGo());   
